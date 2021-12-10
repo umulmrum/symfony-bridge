@@ -3,6 +3,8 @@
 namespace Bref\SymfonyBridge;
 
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -16,7 +18,7 @@ abstract class BrefKernel extends Kernel
     /**
      * {@inheritDoc}
      */
-    public function getCacheDir()
+    public function getCacheDir(): string
     {
         if ($this->isLambda()) {
             return '/tmp/cache/' . $this->environment;
@@ -28,7 +30,7 @@ abstract class BrefKernel extends Kernel
     /**
      * {@inheritDoc}
      */
-    public function getLogDir()
+    public function getLogDir(): string
     {
         if ($this->isLambda()) {
             return '/tmp/log/';
@@ -46,7 +48,7 @@ abstract class BrefKernel extends Kernel
      *
      * @see https://github.com/brefphp/symfony-bridge/pull/37
      */
-    public function handle($request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
+    public function handle(Request $request, int $type = HttpKernelInterface::MASTER_REQUEST, bool $catch = true): Response
     {
         $this->prepareCacheDir(parent::getCacheDir(), $this->getCacheDir());
 
@@ -59,7 +61,7 @@ abstract class BrefKernel extends Kernel
      * We also need to prepare the Cache dir in Kernel::boot in case we are in a Console or worker context
      * in which Kernel::handle is not called.
      */
-    public function boot()
+    public function boot(): void
     {
         $this->prepareCacheDir(parent::getCacheDir(), $this->getCacheDir());
         $this->ensureLogDir($this->getLogDir());
