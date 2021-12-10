@@ -10,8 +10,13 @@ jobs:
       max-parallel: 10
       fail-fast: false
       matrix:
-        php: ['7.3', '7.4', '8.0']
-        sf_version: ['4.4.*', '5.0.*', '5.2.*']
+        php: ['7.3', '7.4', '8.0', '8.1']
+        sf_version: ['5.0.*', '5.2.*', '5.4.*', '6.0.*']
+        exclude:
+          - php: '7.3'
+            sf_version: '6.0.*'
+          - php: '7.4'
+            sf_version: '6.0.*'
 
     steps:
       - name: Set up PHP
@@ -26,6 +31,7 @@ jobs:
 
       - name: Download dependencies
         env:
+          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SYMFONY_REQUIRE: ${{ matrix.sf_version }}
         run: composer update --no-interaction --prefer-dist --optimize-autoloader --prefer-stable
 
@@ -49,6 +55,8 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Download dependencies
+        env:
+          COMPOSER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: composer update --no-interaction --prefer-dist --optimize-autoloader --prefer-stable --prefer-lowest
 
       - name: Run tests
